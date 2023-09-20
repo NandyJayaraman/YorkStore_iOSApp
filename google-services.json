@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "49492851836",
+    "project_id": "jsc-ionic",
+    "storage_bucket": "jsc-ionic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49492851836:android:4a309910b28a6ca502ddf9",
+        "android_client_info": {
+          "package_name": "sa.com.yorkmobilestore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "49492851836-2vpmb6665etqt9eme4v2il0bme1r256h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe4ewjA49uXbZ41yAJ72mquU0YXUTJazA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "49492851836-2vpmb6665etqt9eme4v2il0bme1r256h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "49492851836-70f05t26400acrlpkmm1foh2t4u2b1rf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "sa.com.yorkmobilestore"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

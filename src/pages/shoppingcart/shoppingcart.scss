@@ -1,0 +1,39 @@
+﻿shoppingcart {
+
+  .scroll-content {
+    @include horizontal-space();
+    @include vertical-space();
+    background-color: color($colors, background);
+
+    .btns {
+
+      button {
+         white-space: normal;
+         width: 100%;
+      }
+
+      .checkout-btn {
+        background-color: #ADBDC5;
+      }
+    }
+
+    .free_text{
+      color: red;
+      font-weight: bolder;
+    }
+
+    .coupon-img {
+      position: absolute;
+
+      html[dir='ltr'] & {
+        left: 0;
+        padding-left: 10px;
+      }
+
+      html[dir='rtl'] & {
+        right: 0;
+        padding-right: 10px;
+      }
+    }
+  }
+}

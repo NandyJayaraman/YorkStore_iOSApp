@@ -1,0 +1,296 @@
+﻿<ion-header>
+  <header (onLanguageChange)="onLanguageChange()"></header>
+</ion-header>
+
+<ion-content>
+
+  <!-- Result -->
+  <div *ngIf="product">
+
+    <!-- Product Slider -->
+    <div class="slides-container">
+
+      <!--Arabic-->
+      <ion-slides dir="{{ translate.currentLang=='ar' ? 'rtl' : 'ltr' }}" pager="true">
+        <ion-slide *ngFor="let picture of product.PictureModels"
+          [ngStyle]="{'background-image': 'url('+ (picture.FullSizeImageUrl || picture.ImageUrl || './assets/imgs/no-image.jpg') +')'}"
+          (click)="showSliderFullScreen()">
+        </ion-slide>
+      </ion-slides>
+
+      <div class="actions favorite-btn" (click)="onClickAddToList('wish')">
+        <ion-icon name="{{product.QuantityInWishlist? 'heart' : 'heart-outline'}}"></ion-icon>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="padding-8"></div>
+
+    <!-- Product Info -->
+    <div class="section-content product-info-section">
+      <div class="review"></div>
+      <div class="name">{{product.Name}}</div>
+      <div class="description" [innerHtml]="product.FullDescription"></div>
+    </div>
+
+    <div class="padding-8"></div>
+    <div class="divider"></div>
+    <div class="padding-8"></div>
+
+    <!-- BTU & Quantity -->
+    <div class="section-content product-qty-section">
+      <ion-row align-items-center>
+        <ion-col col-6 class="label" *ngIf="product.StockAvailability">
+          <div class="availability">
+            {{"PRODUCTDETAILS.Availability" | translate}}:
+            <span class="content">{{ product.StockAvailability }}</span>
+          </div>
+        </ion-col>
+        <ion-col col-6>
+          <app-quantity-btn [(quantity)]="product.Quantity.SelectedQuantity"
+            [minimum]="product.Quantity.OrderMinimumQuantity" [maximum]="product.Quantity.OrderMaximumQuantity">
+          </app-quantity-btn>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <div class="padding-8"></div>
+    <div class="divider"></div>
+    <div class="padding-8"></div>
+
+    <!--  Product Attributes  -->
+
+
+    <div class="section-content product-info-section">
+      <div class="img-offer" *ngIf="checkExchange && translate.store.currentLang == 'en'">
+        <img
+          src="https://york.com.sa/images/uploaded/exchange-en.gif"
+          alt="Exchange Offer"
+        />
+      </div>
+
+      <div class="img-offer" *ngIf="checkExchange && translate.store.currentLang == 'ar'">
+        <img
+          src="https://york.com.sa/images/uploaded/exchange-ar.gif"
+          alt="Exchange Offer"
+        />
+      </div>
+
+      <div *ngFor="let item of product.ProductAttributes">
+        <div *ngIf="item.AttributeControlType == 3">
+          <div class="name">{{item.Name}}</div>
+          <div class="padding-8"></div>
+          <div *ngFor="let value of item.Values">
+            <div class="padding-8">
+              <label>
+                <ion-row align-items-center>
+                
+                  <ion-col slot="start" style="flex:0.1;" >
+                    <input type="checkbox" style="height:25px" *ngIf="value.Name.includes('Installation') || value.Name.includes('التركيب')" slot="end"  [(ngModel)]="product.AttributeInfo['product_attribute_'+product.Id+'_'+item.ProductAttributeId+'_'+item.Id + '_' + value.Id]" [id]=value.Id (change)="unCheckDisable($event)" >
+                    <input type="checkbox" style="height:25px;display: none;" *ngIf="value.Name.includes('Pipes') || value.Name.includes('أنابيب')" slot="end"  [(ngModel)]="product.AttributeInfo['product_attribute_'+product.Id+'_'+item.ProductAttributeId+'_'+item.Id + '_' + value.Id]" id="pipes_checkbox" (change)="unCheckDisable($event)" >
+                    <input type="checkbox" class="checkboxesItem" style="height:25px" *ngIf="!(value.Name.includes('Pipes') || value.Name.includes('أنابيب') || value.Name.includes('Installation') || value.Name.includes('التركيب'))" slot="end"  [(ngModel)]="product.AttributeInfo['product_attribute_'+product.Id+'_'+item.ProductAttributeId+'_'+item.Id + '_' + value.Id]" [id]=value.Id >
+                  </ion-col>
+                  <!-- <ion-checkbox  *ngIf="value.Name.includes('Exchange')" slot="end"  [(ngModel)]="product.AttributeInfo['product_attribute_'+product.Id+'_'+item.ProductAttributeId+'_'+item.Id + '_' + value.Id]" [id]=value.Id (ionChange)="unCheckDisable($event)"></ion-checkbox> -->
+                  <!-- <ion-checkbox [disabled]="true" class="checkboxesItem" *ngIf="!value.Name.includes('Exchange')"  slot="end"  [(ngModel)]="product.AttributeInfo['product_attribute_'+product.Id+'_'+item.ProductAttributeId+'_'+item.Id + '_' + value.Id]" id="value.Id"></ion-checkbox> -->
+                  
+                  <ng-container
+                  *ngIf="value.Name.includes('Pipes') || value.Name.includes('أنابيب'); then showPipes; else showOtherItems" >
+                  </ng-container>
+
+                  <div class="padding-4"></div>
+                  <ng-template #showPipes>
+                    <ion-col style="margin-left:6px; display:none" id="pipes_col">
+                      {{value.Name}} [ {{value.PriceAdjustment}} ]
+                    </ion-col>
+                  </ng-template>
+
+                    <ng-template #showOtherItems>
+                      <ion-col style="margin-left:6px">
+                        {{value.Name}} [ {{value.PriceAdjustment}} ]
+                      </ion-col>
+                    </ng-template>
+                </ion-row>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="padding-8"></div>
+    <div class="divider"></div>
+    <div class="padding-8"></div>
+
+    <!-- Delivery & Installation -->
+    <div class="section-content product-delivery-section">
+      <!-- Price Has Old Price-->
+      <div class="delivery-info old-price"
+        *ngIf="product.ProductPrice?.OldPrice && (product.ProductPrice?.Price != product.ProductPrice?.OldPrice)">
+        {{"PRODUCTDETAILS.OldPrice" | translate}} {{product.ProductPrice.OldPrice}}
+      </div>
+      <div class="delivery-info new-price"
+        *ngIf="!product.ProductPrice?.PriceWithDiscount && (product.ProductPrice?.OldPrice && (product.ProductPrice?.Price != product.ProductPrice?.OldPrice))">
+        {{"PRODUCTDETAILS.NewPrice" | translate}} {{product.ProductPrice.Price}}
+      </div>
+
+      <!-- Price Has Discount -->
+      <div class="delivery-info old-price" *ngIf="product.ProductPrice?.PriceWithDiscount">
+        {{"PRODUCTDETAILS.Price" | translate}} {{product.ProductPrice.Price}}
+      </div>
+      <div class="delivery-info new-price" *ngIf="product.ProductPrice?.PriceWithDiscount">
+        {{"PRODUCTDETAILS.YourPrice" | translate}} {{product.ProductPrice.PriceWithDiscount}}
+      </div>
+
+      <!-- Price Has No Discount Or Old Price-->
+      <div class="delivery-info price"
+        *ngIf="!product.ProductPrice?.PriceWithDiscount && !product.ProductPrice?.OldPrice">
+        {{"PRODUCTDETAILS.Price" | translate}} {{product.ProductPrice.Price}}
+      </div>
+
+      <div class="padding-8"></div>
+      <div class="add-cart-container">
+        <button ion-button class="add-cart-btn" (click)="onClickAddToList('cart')">
+          <ion-icon name="cart-outline"></ion-icon> &nbsp;
+          <span *ngIf="!product.AddToCart.AvailableForPreOrder">{{"PRODUCTDETAILS.AddToCart" | translate}}</span>
+          <span *ngIf="product.AddToCart.AvailableForPreOrder">{{"PRODUCTDETAILS.PreOrder" | translate}}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div class="additional-info-section">
+      <div class="info-tabs-header">
+        <div class="info-tabs">
+          <div class="tab" (click)="selectedInfoIndex = 0" [ngClass]="{'active': selectedInfoIndex == 0}">
+            {{"PRODUCTDETAILS.Description" | translate}}
+          </div>
+          <!--
+          <div class="tab" (click)="selectedInfoIndex = 1" [ngClass]="{'active': selectedInfoIndex == 1}">
+            {{"PRODUCTDETAILS.AdditionalInformation" | translate}}
+          </div>-->
+          <div class="tab" (click)="selectedInfoIndex = 2" [ngClass]="{'active': selectedInfoIndex == 2}">
+            {{"PRODUCTDETAILS.Brochure" | translate}}
+          </div>
+        </div>
+      </div>
+
+      <div class="information">
+        <div *ngIf="selectedInfoIndex == 0" [innerHtml]="product.ShortDescription"></div>
+        <div *ngIf="selectedInfoIndex == 1">
+          <ion-row>
+            <div>{{"PRODUCTDETAILS.Height" | translate}}</div>
+            <div class="padding-4"></div>
+          </ion-row>
+          <div class="padding-8"></div>
+          <ion-row>
+            <div>{{"PRODUCTDETAILS.Dimension" | translate}}</div>
+            <div class="padding-4"></div>
+          </ion-row>
+        </div>
+
+        <div *ngIf="selectedInfoIndex == 2">
+          <ion-row align-items-center *ngIf="product.brochureUrl" (click)="onClickReadBrochure(product.brochureUrl)">
+            <div>{{"PRODUCTDETAILS.ClickToReadBrochure" | translate}}</div>
+            <div class="padding-4"></div>
+            <ion-icon class="brochure-icon" name="attach"></ion-icon>
+          </ion-row>
+
+          <div align-items-center *ngIf="!product.brochureUrl">
+            {{"PRODUCTDETAILS.ThereIsNoBrochure" | translate}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products-section">
+      <related-products [productId]="productId"></related-products>
+    </div>
+  </div>
+
+</ion-content>
+
+
+<!-- footer -->
+<app-footer></app-footer>
+<!-- 
+    <ng-template #showExchange>
+                      <ion-col *ngIf="translate.store.currentLang == 'en'">
+                      <li class="offer-new" style="margin-left:6px; width: 90%;">
+                       -- already commented -- 
+                      <ion-checkbox slot="end"  [(ngModel)]="product.AttributeInfo['product_attribute_'+product.Id+'_'+item.ProductAttributeId+'_'+item.Id + '_' + value.Id]"></ion-checkbox> 
+                      -- already Commentedd --
+
+                        <div class="inner-offer">
+                          <div class="inner-info">
+                          <div class="inner-img">
+                          <img
+                          src="https://york.com.sa/images/uploaded/flash-sale.png"
+                          alt="flash sale"
+                          />
+                          </div>
+                          <div class="inner-details">
+                          <p>
+                            {{value.Name.replace('Region','')}} [+<span style="text-decoration: line-through;">478 SAR</span> <span style="color: red; font-weight: bolder;">FREE</span> ]
+                          </p>
+                          </div>
+                          <div class="inner-tip">
+                          <div class="inner-des">
+                          <img src="https://york.com.sa/images/uploaded/help-tip.png" />
+                          </div>
+                          <div class="show-tip">
+                          <div class="show-text">
+                          <p>
+                          This offer cannot be combined with other offers. For more
+                          details
+                          <a
+                         
+                          (click) = "opneLinkEn()"
+                          >Click Here</a
+                          >
+                          </p>
+                          </div>
+                          </div>
+                          </div>
+                          </div>
+                          </div>
+                        </li>
+                      </ion-col>
+  
+                      <ion-col *ngIf="translate.store.currentLang == 'ar'">
+                        <li class="offer-new">
+                          <div class="inner-offer">
+                            <div class="inner-info">
+                              <div class="inner-img">
+                                <img
+                                  src="https://york.com.sa/images/uploaded/flash-sale.png"
+                                  alt="flash sale"
+                                />
+                              </div>
+                              <div class="inner-details" style="text-align: right">
+                                <p> {{value.Name.replace('منطقة', '')}} [<span style="text-decoration: line-through;">+ 478</span> ر.س <span style="font-weight: bolder; color: red; ">مجاناً</span></p>
+                              </div>
+                              <div class="inner-tip">
+                                <div class="inner-des">
+                                  <img src="https://york.com.sa/images/uploaded/help-tip.png" />
+                                </div>
+                                <div class="show-tip" style="left: 0">
+                                  <div class="show-text" style="text-align: right">
+                                    <p>
+                                      للمزيد من المعلومات
+                                      <a
+                                        target="_blank"
+                                        >اضغط هنا</a
+                                      >
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      </ion-col>
+                      </ng-template>
+
+ -->
